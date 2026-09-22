@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI-Based Knowledge Retrieval Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+  <!-- Navigation Header -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center space-x-3">
+      <div class="h-3.5 w-3.5 rounded-full bg-emerald-500 animate-pulse"></div>
+      <h1 class="text-lg font-semibold tracking-wide">Knowledge Retrieval Platform</h1>
+    </div>
+    <div class="text-xs font-mono bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700">
+      Milestones 2 & 3 Pipeline Active
+    </div>
+  </header>
+
+  <!-- Top Ingestion & Document Diagnostic Bar -->
+  <section class="bg-slate-950/40 border-b border-slate-800 px-6 py-3">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <form id="uploadForm" class="flex items-center gap-3">
+        <label class="text-xs font-medium text-slate-400">Knowledge Ingestion:</label>
+        <input type="file" id="fileInput" accept=".txt,.pdf,.md" required
+               class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700 cursor-pointer">
+        <button type="submit" id="uploadBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-md font-medium transition">
+          Ingest & Analyze
+        </button>
+      </form>
+      <div id="uploadStatus" class="text-xs text-slate-400 truncate max-w-xl">
+        No document uploaded yet. System using baseline knowledge base.
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Workstation Grid -->
+  <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 overflow-hidden">
+    
+    <!-- Left Column: Chat Dialogue (7 cols) -->
+    <section class="lg:col-span-7 flex flex-col bg-slate-950/50 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+      <div id="chatHistory" class="flex-1 overflow-y-auto p-4 space-y-4">
+        <div class="p-3.5 bg-slate-800/40 rounded-lg text-sm text-slate-300 border border-slate-800">
+          👋 System initialized. Upload technical documents or query existing sources directly. Voice commands and attribution checks are enabled.
+        </div>
+      </div>
+
+      <!-- Controls & Input Area -->
+      <div class="p-4 border-t border-slate-800 bg-slate-950">
+        <form id="queryForm" class="flex items-center gap-2">
+          <button type="button" id="voiceInputBtn" title="Speech to Text (Milestone 3.3)" class="p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+            🎙️
+          </button>
+          <input type="text" id="queryInput" placeholder="Enter factual, procedural, or comparative query..." required 
+                 class="flex-1 bg-slate-900 border border-slate-700 text-slate-100 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+          <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2 rounded-lg text-sm transition">
+            Submit
+          </button>
+        </form>
+        <div class="flex items-center justify-between mt-2 px-1 text-xs text-slate-400">
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" id="ttsToggle" checked class="rounded bg-slate-800 text-indigo-600 focus:ring-0">
+            <span>Read answers aloud (TTS)</span>
+          </label>
+          <span id="sessionDisplay" class="font-mono text-[10px] text-slate-500"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Response Transparency Panel (5 cols) -->
+    <aside class="lg:col-span-5 flex flex-col bg-slate-950/50 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+      <div class="p-4 border-b border-slate-800 bg-slate-950 flex justify-between items-center">
+        <h2 class="font-semibold text-slate-200 text-sm tracking-wide">Transparency & Analysis Panel</h2>
+        <span id="intentTag" class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono uppercase">Idle</span>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- Initial File Analysis Card -->
+        <div id="docAnalysisCard" class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 text-xs space-y-2 hidden">
+          <div class="font-semibold text-slate-200 flex justify-between">
+            <span>Document Diagnostic</span>
+            <span class="text-emerald-400">Indexed</span>
+          </div>
+          <div id="docAnalysisDetails" class="text-slate-400 space-y-1"></div>
+        </div>
+
+        <!-- System Grounding Metric -->
+        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800/80">
+          <div class="text-xs text-slate-400 mb-1">System Grounding Confidence</div>
+          <div class="flex items-center gap-3">
+            <div class="flex-1 bg-slate-800 rounded-full h-2">
+              <div id="confidenceBar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <span id="confidenceText" class="text-xs font-semibold text-emerald-400">0%</span>
+          </div>
+        </div>
+
+        <!-- Semantic Chunks & Scores -->
+        <div>
+          <h3 class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2">Retrieved Sources & Attributions</h3>
+          <div id="chunksList" class="space-y-2">
+            <div class="text-xs text-slate-500 italic">No retrieved chunks. Submit a query to display semantic matches.</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
